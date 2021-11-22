@@ -2,6 +2,7 @@ import React from 'react';
 import axios from 'axios';
 import jsSHA from "jssha";
 import { auth } from "@/const";
+import { useLocationStore } from "@/store/locationStore";
 
 const checkIsMobile = () => {
   if (typeof window === 'undefined') {
@@ -65,7 +66,7 @@ export const useAxios = async ({
   try {
     const { data } = await axios({
       method,
-      url,
+      url: `${url}&$format=JSON`,
       responseType: 'json',
       headers: {
         Authorization: `hmac username="${auth.id}", algorithm="hmac-sha1", headers="x-date", signature="${HMAC}"`,
@@ -78,4 +79,19 @@ export const useAxios = async ({
     console.log('api error: ', err);
   }
   return responseData;
+};
+
+export const useCurrentPosition = () => {
+  const { locationData, setLocationData } = useLocationStore();
+
+  const getPosition = () => {
+    navigator.geolocation.getCurrentPosition((res) => {
+      setLocationData({ lat: res.coords.latitude, lng: res.coords.longitude });
+    });
+  };
+
+  return {
+    locationData,
+    getPosition
+  }
 };

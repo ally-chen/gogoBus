@@ -1,3 +1,6 @@
+export const apiRoot = 'https://ptx.transportdata.tw/MOTC';
+export const desktopMedia = (styles) => (`@media (min-width: 768px){${styles}}`);
+
 export const colors = {
   main: '#0077FF',
   mainLight: '#ECEEFF',
