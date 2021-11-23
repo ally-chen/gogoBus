@@ -1,10 +1,9 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 import React from 'react';
 import {Link} from 'react-router-dom';
-import {PageTitle, TitleSplit, SecondTitle, Board, StripedList, ItemTitle, TabList} from '@/components/CommonStyle';
-import {useAxios, useCurrentPosition} from '@/common';
-import StationModal from "@/components/StationModal/StationModal";
-import Empty from "@/components/Empty/Empty";
+import {PageTitle, TitleSplit, SecondTitle, Board, StripedList, ItemTitle, TabList} from '@/style';
+import {commonAxios, useCurrentPosition} from '@/common';
+import StationModal from "@/components/StationModal";
+import Empty from "@/components/Empty";
 import {apiRoot} from '@/const';
 
 const Nearby = () => {
@@ -14,8 +13,8 @@ const Nearby = () => {
   const { locationData, getPosition } = useCurrentPosition();
 
   const getNearStations = ({lat, lng, distance}) => {
-    useAxios({
-      url: `${apiRoot}/v2/Bus/Station/NearBy?$spatialFilter=nearby(${lat},${lng},${distance})`,
+    commonAxios({
+      url: `/v2/Bus/Station/NearBy?$spatialFilter=nearby(${lat},${lng},${distance})`,
     }).then((res) => {
       setData(res.filter((n, i, arr) => arr.findIndex((x) => x.StationID === n.StationID) === i));
     });

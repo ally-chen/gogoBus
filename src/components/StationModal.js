@@ -1,11 +1,10 @@
 import React from 'react';
 import L from 'leaflet';
 import { useLocationStore } from '@/store/locationStore';
-import {ItemTitle} from '@/components/CommonStyle';
 import { auth, directionText } from "@/const";
 import userMarker from "@/images/user-marker.svg";
 import mapMarker from "@/images/ic-map-marker-main.svg";
-import {Overlay, ModalWrapper, Modal, MapContainer} from './style';
+import {ItemTitle, Overlay, ModalWrapper, Modal, MapContainer} from '@/style';
 
 let map;
 

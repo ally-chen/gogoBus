@@ -40,6 +40,6 @@ h1, h2, h3 {
   --dark: #1E222B;
 }
 
-*, *:fater, *:before {
+*, *:after, *:before {
   box-sizing: border-box;
 }

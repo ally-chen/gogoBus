@@ -5,11 +5,11 @@ import {
   Outlet
 } from "react-router-dom";
 import { LocationContextProvider } from '@/store/locationStore';
-import Menu from "@/components/Menu/Menu";
-import Search from "@/containers/Search/Search";
-import Nearby from "@/containers/Nearby/Nearby";
-import News from "@/containers/News/News";
-import {Container, PageWrapper} from "./style";
+import Menu from "@/components/Menu";
+import Search from "@/containers/Search";
+import Nearby from "@/containers/Nearby";
+import News from "@/containers/News";
+import { Container, PageWrapper } from "./style";
 
 const Layout = () => (
   <Container>
@@ -26,7 +26,11 @@ const App = () => {
       <Router>
         <Routes>
           <Route path="/" element={<Layout />}>
-            <Route path="search" element={<Search />} />
+            <Route path="search">
+              <Route path=":city" element={<Search />} />
+              <Route path=":city/:route" element={<Search />} />
+              <Route index element={<Search />} />
+            </Route>
             <Route path="nearby" element={<Nearby />} />
             <Route path="news" element={<News />} />
             <Route index element={<Search />} />

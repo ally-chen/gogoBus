@@ -1,7 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import jsSHA from "jssha";
-import { auth } from "@/const";
+import { apiRoot, auth } from "@/const";
 import { useLocationStore } from "@/store/locationStore";
 
 const checkIsMobile = () => {
@@ -56,7 +56,7 @@ const genHMAC = () => {
   return { HMAC, GMTString };
 };
 
-export const useAxios = async ({
+export const commonAxios = async ({
   method = 'get',
   url,
   ...others
@@ -66,7 +66,7 @@ export const useAxios = async ({
   try {
     const { data } = await axios({
       method,
-      url: `${url}&$format=JSON`,
+      url: `${apiRoot}${url}&$format=JSON`,
       responseType: 'json',
       headers: {
         Authorization: `hmac username="${auth.id}", algorithm="hmac-sha1", headers="x-date", signature="${HMAC}"`,

@@ -1,4 +1,4 @@
-import {PageTitle, TitleSplit} from '@/components/CommonStyle';
+import {PageTitle, TitleSplit} from '@/style';
 
 const Search = () => {
   return (
