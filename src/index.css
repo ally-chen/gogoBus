@@ -29,7 +29,17 @@ h1, h2, h3 {
 
 :root {
   --main: #0077FF;
+  --mainLight: #ECEEFF;
+  --secondary: #FFC44E;
   --light: #486AE8;
   --tint: #99BADD;
+  --text-dark: #363636;
   --text-medium: #7D7D7D;
+  --text-light: #B6B6B6;
+  --text-lighter: #D9D9D9;
+  --dark: #1E222B;
+}
+
+*, *:fater, *:before {
+  box-sizing: border-box;
 }

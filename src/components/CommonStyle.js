@@ -63,19 +63,45 @@ export const StripedList = styled.ul`
     margin-top: 2px;
   }
 }
-max-height: calc(100vh - 300px);
+max-height: calc(100vh - 380px);
 overflow-y: scroll;
 &::-webkit-scrollbar {
   width: 6px;
 }
 &::-webkit-scrollbar-track {
-  background: transparent;
+  background: #F6F7FF;
 }
 &::-webkit-scrollbar-thumb {
   background: var(--light);
   border-radius: 6px;
   &:hover {
     background: var(--tint);
+  }
+}
+`;
+
+export const TabList = styled.ul`
+display: flex;
+width: 100%;
+> li {
+  flex-basis: 50%;
+  max-width: 50%;
+  padding: 0.75em 1em;
+  font-size: 18px;
+  font-weight: bold;
+  background-color: #BFCDFF;
+  color: #fff;
+  text-align: center;
+  cursor: pointer;
+  &.active {
+    background-color: var(--light);
+    cursor: default;
+  }
+  &:first-child {
+    border-top-left-radius: 16px;
+  }
+  &:last-child {
+    border-top-right-radius: 16px;
   }
 }
 `;

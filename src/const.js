@@ -14,6 +14,10 @@ export const colors = {
   textLighter: '#D9D9D9',
 };
 
+export const directionText = {
+  E:'東行', W:'西行', S:'南行', N:'北行', SE:'東南行', NE:'東北行', SW:'西南行', NW:'西北行'
+};
+
 export const auth = {
   id: process.env.REACT_APP_TDXID,
   key: process.env.REACT_APP_TDXKEY,
