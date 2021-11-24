@@ -1,16 +1,17 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
-import {PageTitle, TitleSplit, SecondTitle, Board, StripedList, ItemTitle, TabList} from '@/style';
-import {commonAxios, useCurrentPosition} from '@/common';
+import {PageTitle, TitleSplit, SecondTitle, Board, StripedList, ItemTitle, TabList, TitleWithSearch} from '@/style';
+import {commonAxios, useCurrentPosition, useIsMobile} from '@/common';
 import StationModal from "@/components/StationModal";
+import QuickSearch from '@/components/QuickSearch';
 import Empty from "@/components/Empty";
-import {apiRoot} from '@/const';
 
 const Nearby = () => {
   const [currentDistance, setCurrentDistance] = React.useState(300);
   const [data, setData] = React.useState([]);
   const [modalInfo, setModalInfo] = React.useState(null);
   const { locationData, getPosition } = useCurrentPosition();
+  const isMobile = useIsMobile();
 
   const getNearStations = ({lat, lng, distance}) => {
     commonAxios({
@@ -41,8 +42,11 @@ const Nearby = () => {
 
   return (
     <>
-      <PageTitle>Bus Stop <TitleSplit /> 附近站牌</PageTitle>
-      <Board style={{padding: '50px 70px', marginTop: 20}}>
+      <TitleWithSearch>
+        <QuickSearch />
+        <PageTitle>Bus Stop <TitleSplit /> 附近站牌</PageTitle>
+      </TitleWithSearch>
+      <Board style={{padding: isMobile ? '40px 30px' : '50px 70px', marginTop: 20}}>
         <SecondTitle>附近的站牌</SecondTitle>
         <TabList>
           <li className={currentDistance === 300 ? 'active' : ''} onClick={() => setCurrentDistance(300)}>

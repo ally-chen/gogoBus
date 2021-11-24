@@ -8,7 +8,7 @@ const checkIsMobile = () => {
   if (typeof window === 'undefined') {
     return true;
   }
-  return window.innerWidth < 768;
+  return window.innerWidth < 1024;
 };
 
 export const useIsMobile = () => {

@@ -14,7 +14,7 @@ const StyledSelect = () => {
     commonAxios({
       url: `/v2/Bus/Route/City/Taipei/${keyword}?$top=10`,
     }).then((res) => {
-      setOptions(res.map((n) => ({value: n.RouteName.Zh_tw, label: n.RouteName.Zh_tw})).sort((a, b) => a.label.localeCompare(b.label)));
+      setOptions(res?.map((n) => ({value: n.RouteUID, label: n.RouteName.Zh_tw})).sort((a, b) => a.label.localeCompare(b.label)));
     });
   };
   const onChange = (e) => {

@@ -1,6 +1,8 @@
 import styled from 'styled-components';
 import icSearch from '@/images/ic-search-grey.svg';
+import icBus from '@/images/ic-bus-main.svg';
 import emptyBg from '@/images/empty-card.svg';
+import dashedBorder from '@/images/dashed-line.svg';
 import { Link } from 'react-router-dom';
 import { colors, desktopMedia } from '@/const';
 
@@ -18,6 +20,16 @@ padding: 25px 26px 40px;
 flex: 1;
 ${desktopMedia(`
 padding: 46px 82px 67px;
+max-height: 100vh;
+overflow-y: scroll;
+&::-webkit-scrollbar {
+  width: 12px;
+}
+&::-webkit-scrollbar-thumb {
+  border-radius: 8px;
+  background: rgba(72,106,232,0.5);
+  border: 2px solid #F5F6FF;
+}
 `)}
 `;
 
@@ -25,9 +37,11 @@ export const PageTitle = styled.h1`
 font-size: 16px;
 text-transform: uppercase;
 color: var(--light);
+width: 100%;
 ${desktopMedia(`
 font-size: 26px;
 letter-spacing: 1.5px;
+width: auto;
 `)}`;
 
 export const SecondTitle = styled.h2`
@@ -104,18 +118,6 @@ overflow-y: scroll;
 `;
 
 export const StopsStripedList = styled.ul`
-> li {
-  line-height: 1.7;
-  font-size: 14px;
-  display: flex;
-  align-items:center;
-  &:nth-child(odd) {
-    background: #F2F2F2;
-  }
-  &:nth-child(even) {
-    background: #FEFCFC;
-  }
-}
 max-height: calc(100% - 40px);
 overflow-y: scroll;
 &::-webkit-scrollbar {
@@ -130,6 +132,45 @@ overflow-y: scroll;
     background: var(--text-medium);
   }
 }
+> li {
+  line-height: 1.7;
+  font-size: 14px;
+  display: grid;
+  grid-template-columns: 1fr 80px 90px;
+  grid-column-gap: 12px;
+  padding: 0.25em 1.5em;
+  align-items: center;
+  &:nth-child(odd) {
+    background: #F2F2F2;
+  }
+  &:nth-child(even) {
+    background: #FEFCFC;
+  }
+}
+`;
+
+export const StopStatus = styled.span`
+font-weight: bold;
+letter-spacing: 0.05em;
+text-align: center;
+color: ${({children}) => {
+  switch (children) {
+    case '進站中':
+      return 'var(--secondary)';
+    case '末班車已過':
+    case '尚未發車':
+      return 'var(--text-medium)';
+    default:
+      return 'var(--light)';
+  }
+}};
+`;
+
+export const BusPlate = styled.span`
+font-size: 12px;
+color: var(--light);
+padding-left: 32px;
+background: url(${icBus}) 12px center/11px no-repeat;
 `;
 
 export const TabList = styled.ul`
@@ -138,9 +179,10 @@ width: 100%;
 > li {
   flex: 1;
   padding: 0.75em 1em;
-  font-size: 18px;
+  font-size: ${({size}) => size === 'small' ? '14px' : '18px'};
   font-weight: bold;
   background-color: #BFCDFF;
+  white-space: nowrap;
   color: #fff;
   text-align: center;
   cursor: pointer;
@@ -157,20 +199,16 @@ width: 100%;
 }
 `;
 
-export const TitleWithSearch = styled.div`
-display: flex;
-align-items:center;
-flex-wrap: wrap;
-justify-content: space-between;
-margin-bottom: 16px;
-`;
-
 // Menu
 export const MenuWrapper = styled.div`
 box-shadow: 3px 2px 6px rgba(121, 121, 121, 0.25);
 background: var(--light);
+display: flex;
+justify-content: space-between;
+align-items: center;
 ${desktopMedia(`
 border-radius: 16px;
+display: block;
 `)}
 `;
 
@@ -191,27 +229,39 @@ padding: 40px 20px;
 
 export const NavList = styled.ul`
 display: flex;
-flex-direction: column;
 align-items:center;
+${desktopMedia(`
+flex-direction: column;
+`)}
 `;
 
 export const NavListItem = styled.li`
+margin-right: 16px;
 ${desktopMedia(`
 margin-top: 38px;
+margin-right: 0;
 `)}
 `;
 
 export const NavLink = styled(Link)`
 display: flex;
 align-items: center;
+justify-content: center;
+width: 40px;
+height: 40px;
+border-radius: 16px;
+> img {
+  width: 24px;
+}
 &.active, &:hover {
   background-color: #2A4AC2;
 }
 ${desktopMedia(`
-border-radius: 16px;
 width: 62px;
 height: 62px;
-justify-content: center;
+> img {
+  width: auto;
+}
 `)}
 `;
 
@@ -262,17 +312,21 @@ export const SearchInput = styled.input`
 outline: none;
 width: 100%;
 font-family: inherit;
-font-size: 18px;
-background: url(${icSearch}) right 24px center/22px no-repeat, #ffffff;
+background: url(${icSearch}) right 24px center/18px no-repeat, #ffffff;
 box-shadow: 4px 4px 25px rgba(148, 148, 148, 0.25);
 border-radius: 16px;
 border: 0;
-padding: 12px 30px 12px 12px;
+padding: 8px 24px 8px 12px;
 text-align: center;
 color: var(--text-dark);
-&::-webkit-placeholder {
+&::placeholder {
   color: var(--text-medium);
 }
+${desktopMedia(`
+font-size: 18px;
+padding: 12px 30px 12px 12px;
+background-size: 22px;
+`)}
 `
 
 export const DropdownWrapper = styled.div`
@@ -303,6 +357,10 @@ export const DropdownList = styled.ul`
   &::-webkit-scrollbar-thumb {
     background: ${colors.light};
     border-radius: 6px;
+    border: 2px solid #F5F6FF;
+  }
+  &::-webkit-scrollbar-track {
+    background: #ffffff;
     border: 2px solid #F5F6FF;
   }
 `;
@@ -340,16 +398,45 @@ letter-spacing: 0.05em;
 
 // Search
 
+export const TitleWithSearch = styled.div`
+display: flex;
+align-items:center;
+flex-wrap: wrap;
+justify-content: flex-end;
+margin-bottom: 16px;
+${DropdownWrapper} {
+  width: 160px;
+  margin-bottom: 10px;
+}
+${desktopMedia(`
+justify-content: space-between;
+> h1 {
+  order: -1;
+}
+${DropdownWrapper} {
+  width: 310px;
+  margin-bottom: 0px;
+}
+`)}
+`;
+
 export const SearchWrapper = styled.div`
+${desktopMedia(`
 height: calc(100vh - 200px);
+min-height: 650px;
 display:flex;
+`)}
 `;
 
 export const SearchCol1 = styled.div`
-flex: 3;
+flex-basis: 380px;
 display: flex;
 flex-direction: column;
+margin-bottom: 28px;
+${desktopMedia(`
 margin-right: 28px;
+margin-bottom: 0px;
+`)}
 > div {
   flex: 1;
   max-height:calc(50% - 14px);
@@ -362,13 +449,17 @@ margin-right: 28px;
 }
 ${EmptyWrapper} {
   height: 100%;
-  min-height: auto;
+  min-height: 240px;
+  max-height: none;
   padding: 40px 20px;
+${desktopMedia(`
+  min-height: auto;
+`)}
 }
 `;
 
 export const SearchCol2 = styled.div`
-flex: 5;
+flex: 1;
 `;
 
 export const ClockText = styled.div`
@@ -378,4 +469,84 @@ top: 30%;
 transform: translate(-50%, 0);
 font-size: 72px;
 color: #fff;
+`;
+
+export const SearchFieldWrapper = styled.div`
+display: flex;
+align-items: center;
+padding: 12px 6px;
+position: relative;
++ div {
+  border-top: 1px dashed transparent;
+  border-image: url('${dashedBorder}') 1 1 round;
+}
+> img {
+  width: 20px;
+  margin-right: 16px;
+}
+&:after{
+  content: '';
+  border-top: 11px solid var(--text-light);
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  position: absolute;
+  top: 50%;
+  margin-top: -6px;
+  right: 32px;
+  z-index: 1;
+}
+${DropdownList} {
+  top: calc(100% - 4px);
+  max-height: 125px;
+  max-width: 230px;
+}
+${DropdownListItem} {
+  padding: 8px 12px;
+}
+${SearchInput} {
+  background: none;
+  box-shadow: none;
+  font-weight: bold;
+  text-align: left;
+  font-size: 14px;
+  color: var(--text-dark);
+  &::placeholder {
+    color: var(--text-light);
+  }
+}
+`;
+
+export const SearchBtn = styled.button`
+border-radius: 20px;
+background: var(--light);
+text-align: center;
+color: #fff;
+padding: 0.5em 1em;
+font-weight: bold;
+font-size: 16px;
+border: 0;
+width: 90%;
+display: block;
+margin: 1em auto 0;
+cursor: pointer;
+`;
+
+export const RouteMap = styled.div`
+height: 100%;
+min-height: 360px;
+box-shadow: 1px 4px 15px rgba(140, 140, 140, 0.25);
+border-radius: 16px;
+.icon-number {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: var(--light);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  box-shadow: 2px 4px 4px rgba(0, 0, 0, 0.25);
+}
 `;
