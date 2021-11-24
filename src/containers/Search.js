@@ -4,12 +4,13 @@ import parseWKT from 'wellknown';
 import { useParams, useNavigate } from 'react-router';
 import icPoint from '@/images/ic-point.svg';
 import icMapMarker from '@/images/ic-map-marker.svg';
+import icBus from '@/images/ic-bus.svg';
 import QuickSearch from '@/components/QuickSearch';
 import SearchSelect from '@/components/SearchSelect';
 import Empty from "@/components/Empty";
 import {PageTitle, TitleSplit, TitleWithSearch, Board, SecondTitle, RouteMap,
   SearchWrapper, SearchCol1, SearchCol2, ClockText, TabList, StopsStripedList, StopStatus, BusPlate, SearchBtn} from '@/style';
-import {commonAxios, useIsMobile} from '@/common';
+import {commonAxios, useIsMobile, useCurrentPosition} from '@/common';
 import {auth, colors, cities} from '@/const';
 import moment from 'moment';
 
@@ -31,15 +32,59 @@ L.NumberedIcon = L.Icon.extend({
 	},
 });
 
-let map;
+L.BusIcon = L.Icon.extend({
+	options: {
+    plateNumb: '',
+    className: 'icon-bus',
+    iconAnchor: [36, 18],
+    popupAnchor: [0, -18]
+	},
 
-const initMap = (ele, wkt, stops = []) => {
+	createIcon: function () {
+		var div = document.createElement('div');
+    var img = document.createElement('img');
+    img.setAttribute('src', icBus);
+    div.appendChild(img);
+    div.append(this.options['plateNumb'] || '');
+		this._setIconStyles(div, 'icon');
+		return div;
+	},
+});
+
+let map;
+let busLayer = L.layerGroup();
+let stopsLayer = L.layerGroup();
+
+const initActiveBus = (points) => {
+  busLayer.clearLayers();
+  points.forEach((bus, i) => {
+    const { PositionLat, PositionLon } = bus.BusPosition;
+    const marker = L.marker([PositionLat, PositionLon], {
+      icon: new L.BusIcon({plateNumb: bus.PlateNumb})
+    }).addTo(busLayer);
+    marker.bindPopup(`${bus.Speed} kph`);
+  });
+  busLayer.addTo(map);
+};
+
+const initStops = (points) => {
+  stopsLayer.clearLayers();
+  points.forEach((s, i) => {
+    const { PositionLat, PositionLon } = s.StopPosition;
+    const marker = L.marker([PositionLat, PositionLon], {
+      icon: new L.NumberedIcon({number: s.StopSequence})
+    }).addTo(stopsLayer);
+    marker.bindPopup(s.StopName.Zh_tw);
+  });
+  stopsLayer.addTo(map);
+};
+
+const initMap = (ele, wkt) => {
   const lineData = L.GeoJSON.coordsToLatLngs(parseWKT(wkt).coordinates);
   const l = L.polyline(lineData, {color: colors.light});
   const bounds = l.getBounds();
   const center = bounds.getCenter();
-  const mymap = L.map(ele, {zoomControl: false}).setView([center.lat, center.lng], 15);
-  const layerGroup = L.layerGroup().addTo(mymap);
+  const mymap = L.map(ele).setView([center.lat, center.lng], 15);
   L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
     maxZoom: 18,
@@ -50,40 +95,41 @@ const initMap = (ele, wkt, stops = []) => {
   }).addTo(mymap);
   l.addTo(mymap);
 
-  stops.forEach((s, i) => {
-    const { PositionLat, PositionLon } = s.StopPosition;
-    const marker = L.marker([PositionLat, PositionLon], {
-      icon: new L.NumberedIcon({number: s.StopSequence})
-    }).addTo(layerGroup);
-    marker.bindPopup(s.StopName.Zh_tw);
-  });
-
   mymap.fitBounds(bounds);
   return mymap;
 };
 
+const initBasicMap = (ele, center) => {
+  const mymap = L.map(ele).setView([center ? center.lat : 25.04454809288478, center ? center.lng : 121.53947779457634], 13);
+  L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+    maxZoom: 18,
+    id: 'allychen/ckw5waap41dl514o4rcpa1nsn',
+    tileSize: 512,
+    zoomOffset: -1,
+    accessToken: auth.mapBoxToken
+  }).addTo(mymap);
+
+  return mymap;
+};
 const Search = () => {
+  const { locationData, getPosition } = useCurrentPosition();
   const ref = React.useRef();
   const navigate = useNavigate();
   const {city: urlCity, route: urlRoute} = useParams();
   const [clock, setClock] = React.useState('');
-  const [mapInitialized, setMapInitialized] = React.useState(false);
   const [filterConfig, setFilterConfig] = React.useState(null);
-  const [currentRoute, setCurrentRoute] = React.useState(null);
   const [routeOptions, setRouteOptions] = React.useState([]);
+  const [activeBus, setActiveBus] = React.useState([]);
+  const [dynamicStopsList, setDynamicStopsList] = React.useState([]);
+  const [currentRoute, setCurrentRoute] = React.useState(null);
   const [stopsList, setStopsList] = React.useState([]);
-  const [activeList, setActiveList] = React.useState(0);
   const [routeShape, setRouteShape] = React.useState('');
+  const [activeList, setActiveList] = React.useState(0);
   const isMobile = useIsMobile();
 
-  const getStops = (city, route) => {
+  const getDynamicData = (city, route, list) => {
     Promise.all([
-      commonAxios({
-        url: `/v2/Bus/Route/City/${city}?$filter=RouteUID eq '${route}'`,
-      }),
-      commonAxios({
-        url: `/v2/Bus/StopOfRoute/City/${city}?$filter=RouteUID eq '${route}'`,
-      }),
       commonAxios({
         url: `/v2/Bus/RealTimeByFrequency/City/${city}?$filter=RouteUID eq '${route}'`,
       }),
@@ -93,52 +139,63 @@ const Search = () => {
       commonAxios({
         url: `/v2/Bus/EstimatedTimeOfArrival/City/${city}?$filter=RouteUID eq '${route}'`,
       }),
-      commonAxios({
-        url: `/v2/Bus/Shape/City/${city}?$filter=RouteUID eq '${route}'`,
-      }),
     ]).then((results) => {
-      const [routeInfos, routeStops, routeRealPoint, routeRealNearStop, estimatedArrival, shapes] = results;
+      const [routeRealPoint, routeRealNearStop, estimatedArrival] = results;
 
-      const routeInfo = routeInfos[0];
-      setCurrentRoute(routeInfo);
-
-      const subRoutes = routeStops.map((n) => ({
-        ...n,
-        destination: n.Direction === 0 ? routeInfo.DestinationStopNameZh : routeInfo.DepartureStopNameZh
-      }));
+      const mergeList = [...list];
 
       if (routeRealNearStop.length > 0) {
         routeRealNearStop.forEach((bus) => {
-          const subRouteIndex = subRoutes.findIndex((n) => n.Direction === bus.Direction && n.SubRouteUID === bus.SubRouteUID);
+          const subRouteIndex = mergeList.findIndex((n) => n.Direction === bus.Direction && n.SubRouteUID === bus.SubRouteUID);
           if (subRouteIndex > -1) {
-            subRoutes[subRouteIndex].Stops[bus.StopSequence - 1].BusPlate = bus.PlateNumb;
-            subRoutes[subRouteIndex].Stops[bus.StopSequence - 1].busStatus = bus.DutyStatus;
+            mergeList[subRouteIndex].Stops[bus.StopSequence - 1].BusPlate = bus.PlateNumb;
+            mergeList[subRouteIndex].Stops[bus.StopSequence - 1].busStatus = bus.DutyStatus;
           }
         });
       }
       estimatedArrival.forEach((stop) => {
         const estimateTime = stop.EstimateTime ? parseInt(stop.EstimateTime/60) : 0;
-        const subRouteIndex = subRoutes.findIndex((n) => (stop.Direction === 255 && n.SubRouteUID === stop.SubRouteUID) ||
+        const subRouteIndex = mergeList.findIndex((n) => (stop.Direction === 255 && n.SubRouteUID === stop.SubRouteUID) ||
         (n.Direction === stop.Direction && n.RouteUID === stop.RouteUID));
 
-        const stopIndex = subRoutes[subRouteIndex]?.Stops.findIndex((n) => n.StopUID === stop.StopUID);
+        const stopIndex = mergeList[subRouteIndex]?.Stops.findIndex((n) => n.StopUID === stop.StopUID);
         if (stopIndex > -1) {
-          subRoutes[subRouteIndex].Stops[stopIndex].status = stop.StopStatus ? statusMap[stop.StopStatus]
+          mergeList[subRouteIndex].Stops[stopIndex].status = stop.StopStatus ? statusMap[stop.StopStatus]
           : `${estimateTime > 1 ? `約${estimateTime}分` : '進站中'}`;
         }
-        if (subRoutes[subRouteIndex]?.Stops[stopIndex]?.busStatus === 1) {
-          subRoutes[subRouteIndex].Stops[stopIndex].status = '進站中';
+        if (mergeList[subRouteIndex]?.Stops[stopIndex]?.busStatus === 1) {
+          mergeList[subRouteIndex].Stops[stopIndex].status = '進站中';
         }
       });
-      if (!routeShape) {
-        setRouteShape(shapes[0].Geometry);
-      }
+
+      setActiveBus(routeRealPoint);
+      setDynamicStopsList(mergeList);
+    })
+  };
+
+  const getStaticData = (city, route) => {
+    Promise.all([
+      commonAxios({
+        url: `/v2/Bus/Route/City/${city}?$filter=RouteUID eq '${route}'`,
+      }),
+      commonAxios({
+        url: `/v2/Bus/StopOfRoute/City/${city}?$filter=RouteUID eq '${route}'`,
+      }),
+      commonAxios({
+        url: `/v2/Bus/Shape/City/${city}?$filter=RouteUID eq '${route}'`,
+      })
+    ]).then((results) => {
+      const [routeInfos, routeStops, shapes, fake] = results;
+      console.log('f', fake);
+      const routeInfo = routeInfos[0];
+
+      const subRoutes = routeStops.map((n) => ({
+        ...n,
+        destination: n.Direction === 0 ? routeInfo.DestinationStopNameZh : routeInfo.DepartureStopNameZh
+      }));
+      setCurrentRoute(routeInfo);
+      setRouteShape(shapes[0].Geometry);
       setStopsList(subRoutes.filter((n, i) => i < 2));
-      // console.log('routeInfo', routeInfo);
-      // console.log('routeStops', routeStops);
-      // console.log('routeRealNearStop', routeRealNearStop);
-      // console.log('routeRealPoint', routeRealPoint);
-      // console.log('estimatedArrival', estimatedArrival);
     });
   };
 
@@ -158,8 +215,6 @@ const Search = () => {
 
   const OnTabClick = (key) => {
     setActiveList(key);
-    // map.remove();
-    // map = initMap(ref.current, routeShape, stopsList[key].Stops);
   };
 
   React.useEffect(() => {
@@ -174,53 +229,68 @@ const Search = () => {
     }
   }, [clock]);
 
+ // 依url取得靜態站點資料
   React.useEffect(() => {
-    const timer = setInterval(() => {
-      if (urlCity && urlRoute) {
-        getStops(urlCity, urlRoute);
-      }
-    }, 10000);
+    if (urlCity && urlRoute) {
+      getStaticData(urlCity, urlRoute);
+    } else {
+      setCurrentRoute(null);
+      setRouteShape('');
+      setStopsList([]);
+    }
+  }, [urlCity, urlRoute]);
+
+ // 取得站點資料後再取得動態資料
+  React.useEffect(() => {
+    if (stopsList.length > 0) {
+      getDynamicData(urlCity, urlRoute, stopsList);
+    }
+  }, [stopsList]);
+
+  // 取得路線資料後繪製圖片
+   React.useEffect(() => {
+     if (routeShape) {
+       map = initMap(ref.current, routeShape);
+       console.log('aaa');
+     } else {
+       map = initBasicMap(ref.current, locationData);
+       console.log('bbb');
+     }
+     return () => {
+       if (map) {
+        map.remove();
+       }
+     }
+   }, [routeShape, locationData]);
+
+  // 有動態資料時設定interval
+  React.useEffect(() => {
+    let timer;
+    if (activeBus.length > 0) {
+      const refreshData = () => {
+        getDynamicData(urlCity, urlRoute, stopsList);
+        if (activeBus.map((n) => n.Direction).includes(activeList)) {
+          initActiveBus(activeBus.filter((n) => n.Direction === activeList));
+        }
+      };
+      refreshData();
+      timer = setInterval(refreshData, 10000);
+    }
     return () => {
       clearInterval(timer);
     }
-  }, [clock, urlCity, urlRoute]);
+  }, [activeBus, activeList]);
 
-  
+  // 切換tab時重繪站點
   React.useEffect(() => {
-    if (!mapInitialized && stopsList.length > 0 && routeShape) {
-      map = initMap(ref.current, routeShape, stopsList[activeList].Stops);
-      setMapInitialized(true);
-      console.log('gogo');
+    if (stopsList.length > 0) {
+      initStops(stopsList[activeList].Stops);
     }
-  }, [routeShape, stopsList]);
+  }, [activeList, stopsList]);
 
   React.useEffect(() => {
-    if (mapInitialized) {
-      map = initMap(ref.current, routeShape, stopsList[activeList].Stops);
-    }
-    return () => {
-      if (map) {
-        map.remove();
-      }
-    }
-  }, [activeList]);
-
-  React.useEffect(() => {
-    return () => {
-      if (map) {
-        map.remove();
-      }
-    }
+    getPosition();
   }, []);
-
-  React.useEffect(() => {
-    if (urlCity && urlRoute) {
-      getStops(urlCity, urlRoute);
-      setRouteShape('');
-    } else {
-      setCurrentRoute(null)
-    }
-  }, [urlCity, urlRoute]);
 
   const currentCity = cities.find((n) => n.key === currentRoute?.City)?.name;
 
@@ -250,6 +320,7 @@ const Search = () => {
               <SearchBtn onClick={onSearch} type="button">搜尋</SearchBtn>
             </Board>
           </div>
+          {isMobile && (<RouteMap ref={ref} style={{marginBottom: 28}} />)}
           <div>
             {urlCity && urlRoute ? (
               <Board>
@@ -261,7 +332,7 @@ const Search = () => {
                   ))}
                 </TabList>
                 <StopsStripedList>
-                  {stopsList[activeList]?.Stops.map((stop) => (
+                  {dynamicStopsList[activeList]?.Stops.map((stop) => (
                     <li key={stop.StopID}>
                       <span>{stop.StopName.Zh_tw}</span>
                       <StopStatus>{stop.status}</StopStatus>
@@ -278,9 +349,11 @@ const Search = () => {
             )}
           </div>
         </SearchCol1>
-        <SearchCol2>
-          <RouteMap ref={ref} />
-        </SearchCol2>
+       {!isMobile && (
+          <SearchCol2>
+            <RouteMap ref={ref} />
+          </SearchCol2>
+        )}
       </SearchWrapper>
     </>
   );

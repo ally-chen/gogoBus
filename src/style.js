@@ -549,4 +549,17 @@ border-radius: 16px;
   font-weight: bold;
   box-shadow: 2px 4px 4px rgba(0, 0, 0, 0.25);
 }
+.icon-bus {
+  padding: 6px;
+  border-radius: 6px;
+  font-size: 10px;
+  text-align: center;
+  width: 72px;
+  background: var(--light);
+  color: #fff;
+  > img {
+    display: block;
+    margin: 0 auto;
+  }
+}
 `;
