@@ -1,9 +1,12 @@
 # GoGo Bus | 全台公車動態時刻查詢應用服務
-本專案為The F2E第三周挑戰前端個人組作品->[Demo](https://ally-chen.github.io/gogoBus)\
-採用設計師[Tracy](https://2021.thef2e.com/users/6296427084285739806)的美美設計搞（感謝設計師大大！
+本專案為[The F2E 3rd](https://2021.thef2e.com/)挑戰第三周：全台公車動態時刻查詢應用服務，前端個人組作品\
+→ [Demo](https://ally-chen.github.io/gogoBus)
+
+
+採用設計師[Tracy](https://2021.thef2e.com/users/6296427084285739806)的美美設計搞（感謝設計師大大！）
 
 ## 系統說明
-(本專案使用create react app建立)
+(本專案使用create react app建立)\
 `npm install` -> 安裝此專案必須的模組\
 `npm start` -> 運行此專案 (打開[本地端](http://localhost:3101)即可瀏覽)
 
