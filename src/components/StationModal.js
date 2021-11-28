@@ -36,7 +36,13 @@ const StationModal = ({data, close, showUserPopup}) => {
           }
         });
       }
-      setRouteData(routes);
+      setRouteData(routes.map((n) => {
+        const estimateTime = n.EstimateTime ? parseInt(n.EstimateTime/60) : 0;
+        if (!n.StopStatus || n.BusPlate) {
+          return {...n, status: `${estimateTime > 1 ? `約${estimateTime}分` : '進站中'}`}
+        }
+        return {...n, status: statusMap[n.StopStatus]};
+      }));
     });
   };
   const initMap = (config, ele) => {
@@ -95,7 +101,7 @@ const StationModal = ({data, close, showUserPopup}) => {
                 {routeData.map((route) => (
                   <li key={route.RouteUID}>
                     <span>{route.RouteName.Zh_tw}</span>
-                    <StopStatus>{statusMap[route.StopStatus]}</StopStatus>
+                    <StopStatus>{route.status}</StopStatus>
                     {route.BusPlate && <BusPlate>{route.BusPlate}</BusPlate>}
                   </li>
                 ))}
