@@ -12,6 +12,7 @@ import {PageTitle, TitleSplit, Board, StripedList, ItemTitle, SecondTitle,
   Overlay, ModalWrapper, Modal, IconBtn, TitleWithSearch} from '@/style';
 
 const News = () => {
+  const modalRef = React.useRef(null);
   const [data, setData] = React.useState([]);
   const [modalInfo, setModalInfo] = React.useState(null);
   const [targetCity, setTargetCity] = React.useState('Taipei');
@@ -67,8 +68,8 @@ const News = () => {
       </Board>
       {modalInfo && (
         <Overlay onClick={closeModal}>
-          <ModalWrapper>
-            <Modal onClick={(e) => e.stopPropagation()} style={{width: 750}}>
+          <ModalWrapper style={{alignItems: modalRef.current?.offsetHeight < window.innerHeight ? 'center' : 'baseline'}}>
+            <Modal ref={modalRef} onClick={(e) => e.stopPropagation()} style={{width: 750}}>
               <IconBtn onClick={closeModal} type="button"><img src={icClose} alt="x" width="20" /></IconBtn>
               <ItemTitle>{modalInfo.Title}</ItemTitle>
               <small>{moment(modalInfo.PublishTime).format('YYYY/MM/DD HH:mm:ss')} | {modalInfo.Department}</small>

@@ -12,7 +12,8 @@ import {ItemTitle, Overlay, ModalWrapper, Modal, MapContainer, IconBtn,
 let map;
 
 const StationModal = ({data, close, showUserPopup}) => {
-  const ref = React.useRef();
+  const ref = React.useRef(null);
+  const modalRef = React.useRef(null);
   const {locationData} = useLocationStore();
   const [routeData, setRouteData] = React.useState([]);
 
@@ -90,8 +91,8 @@ const StationModal = ({data, close, showUserPopup}) => {
   }, []);
   return (
     <Overlay onClick={close}>
-      <ModalWrapper>
-        <Modal onClick={(e) => e.stopPropagation()}>
+      <ModalWrapper style={{alignItems: modalRef.current?.offsetHeight < window.innerHeight ? 'center' : 'baseline'}}>
+        <Modal ref={modalRef} onClick={(e) => e.stopPropagation()}>
           <IconBtn onClick={close} type="button"><img src={icClose} alt="x" width="20" /></IconBtn>
           <SearchWrapper style={{height: 'auto', minHeight: 'auto'}}>
             <SearchCol1>
