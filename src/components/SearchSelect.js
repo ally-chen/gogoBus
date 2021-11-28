@@ -2,7 +2,7 @@ import React from 'react';
 // import PropTypes from 'prop-types';
 import { SearchFieldWrapper, SearchInput, DropdownWrapper, DropdownList, DropdownListItem } from '@/style';
 
-const SearchSelect = ({options, placeholder, onSelect, icon}) => {
+const SearchSelect = ({options, placeholder, onSelect, icon, defaultValue}) => {
   const [inputValue, setInputValue] = React.useState('');
   const [showDropdown, setShowDropdown] = React.useState(false);
   const [filterOptions, setFilterOptions] = React.useState([]);
@@ -43,6 +43,13 @@ const SearchSelect = ({options, placeholder, onSelect, icon}) => {
       setFilterOptions(options);
     }
   }, [options]);
+
+  React.useEffect(() => {
+    if (defaultValue) {
+      const opt = options.find((n) => n.value === defaultValue);
+      setInputValue(opt?.label);
+    }
+  }, [defaultValue]);
 
   return (
     <SearchFieldWrapper>

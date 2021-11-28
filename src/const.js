@@ -18,6 +18,8 @@ export const directionText = {
   E:'東行', W:'西行', S:'南行', N:'北行', SE:'東南行', NE:'東北行', SW:'西南行', NW:'西北行'
 };
 
+export const statusMap = {0:'正常',1:'尚未發車',2:'交管不停靠',3:'末班車已過',4:'今日未營運'};
+
 export const auth = {
   id: process.env.REACT_APP_TDXID,
   key: process.env.REACT_APP_TDXKEY,
@@ -137,3 +139,28 @@ export const cities = [
     latlng: {lng: 119.9516487, lat: 26.1602145}
   },
 ];
+
+export const cityCodeMap = {
+  TPE: 'Taipei',
+  TXG: 'Taichung',
+  KEE: 'Keelung',
+  TNN: 'Tainan',
+  KHH: 'Kaohsiung',
+  NWT: 'NewTaipei',
+  ILA: 'YilanCounty',
+  TAO: 'Taoyuan',
+  CYI: 'Chiayi',
+  HSQ: 'HsinchuCounty',
+  MIA: 'MiaoliCounty',
+  NAN: 'NantouCounty',
+  CHA: 'ChanghuaCounty',
+  HSZ: 'Hsinchu',
+  YUN: 'YunlinCounty',
+  CYQ: 'ChiayiCounty',
+  PIF: 'PingtungCounty',
+  HUA: 'HualienCounty',
+  TTT: 'TaitungCounty',
+  KIN: 'KinmenCounty',
+  PEN: 'PenghuCounty',
+  LIE: 'LienchiangCounty',
+};

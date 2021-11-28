@@ -4,17 +4,17 @@ import parseWKT from 'wellknown';
 import { useParams, useNavigate } from 'react-router';
 import icPoint from '@/images/ic-point.svg';
 import icMapMarker from '@/images/ic-map-marker.svg';
+import icSite from '@/images/ic-site.svg';
 import icBus from '@/images/ic-bus.svg';
 import QuickSearch from '@/components/QuickSearch';
 import SearchSelect from '@/components/SearchSelect';
+import StationModal from "@/components/StationModal";
 import Empty from "@/components/Empty";
 import {PageTitle, TitleSplit, TitleWithSearch, Board, SecondTitle, RouteMap,
-  SearchWrapper, SearchCol1, SearchCol2, ClockText, TabList, StopsStripedList, StopStatus, BusPlate, SearchBtn} from '@/style';
+  SearchWrapper, SearchCol1, SearchCol2, ClockText, TabList, StopsStripedList, StopStatus, BusPlate, SearchBtn, IconBtn} from '@/style';
 import {commonAxios, useIsMobile, useCurrentPosition} from '@/common';
-import {auth, colors, cities} from '@/const';
+import {auth, colors, cities, statusMap, cityCodeMap} from '@/const';
 import moment from 'moment';
-
-const statusMap = {0:'正常',1:'尚未發車',2:'交管不停靠',3:'末班車已過',4:'今日未營運'};
 
 L.NumberedIcon = L.Icon.extend({
 	options: {
@@ -125,6 +125,7 @@ const Search = () => {
   const [currentRoute, setCurrentRoute] = React.useState(null);
   const [stopsList, setStopsList] = React.useState([]);
   const [routeShape, setRouteShape] = React.useState('');
+  const [modalInfo, setModalInfo] = React.useState(null);
   const [activeList, setActiveList] = React.useState(0);
   const isMobile = useIsMobile();
 
@@ -185,8 +186,7 @@ const Search = () => {
         url: `/v2/Bus/Shape/City/${city}?$filter=RouteUID eq '${route}'`,
       })
     ]).then((results) => {
-      const [routeInfos, routeStops, shapes, fake] = results;
-      console.log('f', fake);
+      const [routeInfos, routeStops, shapes] = results;
       const routeInfo = routeInfos[0];
 
       const subRoutes = routeStops.map((n) => ({
@@ -215,6 +215,29 @@ const Search = () => {
 
   const OnTabClick = (key) => {
     setActiveList(key);
+  };
+
+  const getStopInfo = (city, id) => {
+    return commonAxios({
+      url: `/v2/Bus/Stop/City/${city}?$filter=StopUID eq '${id}'&`,
+    });
+  };
+
+  const openModal = (stopData) => {
+    const city = cityCodeMap[stopData.StopUID.substr(0, 3)];
+    getStopInfo(city, stopData.StopUID).then((res) => {
+      const stationCity = cityCodeMap[res[0].LocationCityCode];
+      commonAxios({
+        url: `/v2/Bus/Station/City/${stationCity}?$filter=StationID eq '${res[0].StationID}'&`,
+      }).then((res) => {
+        setModalInfo(res[0]);
+      })
+    });
+
+  };
+
+  const closeModal = () => {
+    setModalInfo(null);
   };
 
   React.useEffect(() => {
@@ -251,10 +274,9 @@ const Search = () => {
    React.useEffect(() => {
      if (routeShape) {
        map = initMap(ref.current, routeShape);
-       console.log('aaa');
-     } else {
+     }
+     if (!routeShape && locationData) {
        map = initBasicMap(ref.current, locationData);
-       console.log('bbb');
      }
      return () => {
        if (map) {
@@ -289,7 +311,9 @@ const Search = () => {
   }, [activeList, stopsList]);
 
   React.useEffect(() => {
-    getPosition();
+    if (!urlCity && !urlRoute) {
+      getPosition();
+    }
   }, []);
 
   const currentCity = cities.find((n) => n.key === currentRoute?.City)?.name;
@@ -334,7 +358,12 @@ const Search = () => {
                 <StopsStripedList>
                   {dynamicStopsList[activeList]?.Stops.map((stop) => (
                     <li key={stop.StopID}>
-                      <span>{stop.StopName.Zh_tw}</span>
+                      <div>
+                        <IconBtn type="button" onClick={() => openModal(stop)} style={{verticalAlign: -2, marginRight: 6}}>
+                          <img src={icSite} alt="" />
+                        </IconBtn>
+                        {stop.StopName.Zh_tw}
+                      </div>
                       <StopStatus>{stop.status}</StopStatus>
                       {stop.BusPlate && <BusPlate>{stop.BusPlate}</BusPlate>}
                     </li>
@@ -353,6 +382,9 @@ const Search = () => {
           <SearchCol2>
             <RouteMap ref={ref} />
           </SearchCol2>
+        )}
+        {modalInfo && (
+          <StationModal data={modalInfo} close={closeModal} />
         )}
       </SearchWrapper>
     </>

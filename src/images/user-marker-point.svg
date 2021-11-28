@@ -1,0 +1,19 @@
+<svg version="1.2" baseProfile="tiny-ps" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 31 23" width="31" height="23">
+	<title>user-marker</title>
+	<defs>
+		<linearGradient id="grd1" gradientUnits="userSpaceOnUse"  x1="0.088" y1="7.013" x2="14.283" y2="7.013">
+			<stop offset="0" stop-color="#7D7D7D"  />
+			<stop offset="1" stop-color="#7D7D7D"  />
+		</linearGradient>
+	</defs>
+	<style>
+		tspan { white-space:pre }
+		.shp0 { fill: #7D7D7D } 
+		.shp1 { fill: url(#grd1) } 
+		.shp2 { fill: #ffffff } 
+	</style>
+	<path id="Layer" class="shp0" d="M22 10.45C19.11 10.45 16.77 8.12 16.77 5.23C16.77 2.34 19.11 0 22 0C24.89 0 27.23 2.34 27.23 5.23C27.23 8.12 24.89 10.45 22 10.45Z" />
+	<path id="Layer" class="shp0" d="M31 22.35L13 22.35C13 22.26 13 22.16 13 22.06C13 17.09 17.03 13.06 22 13.06C26.97 13.06 31 17.09 31 22.06C31 22.16 31 22.26 31 22.35Z" />
+	<path id="Layer copy" class="shp1" d="M6.99 14.11C3.07 14 -0.02 10.74 0.09 6.82C0.2 2.89 3.46 -0.19 7.38 -0.08C11.3 0.03 14.39 3.28 14.28 7.21C14.17 11.13 10.91 14.22 6.99 14.11Z" />
+	<path id="Layer copy 2" class="shp2" d="M6.95 9.62C5.42 9.57 4.21 8.3 4.25 6.77C4.29 5.23 5.57 4.03 7.1 4.07C8.63 4.11 9.84 5.39 9.8 6.92C9.75 8.45 8.48 9.66 6.95 9.62Z" />
+</svg>

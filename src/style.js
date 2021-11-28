@@ -3,7 +3,7 @@ import icSearch from '@/images/ic-search-grey.svg';
 import icBus from '@/images/ic-bus-main.svg';
 import emptyBg from '@/images/empty-card.svg';
 import dashedBorder from '@/images/dashed-line.svg';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { colors, desktopMedia } from '@/const';
 
 // Common
@@ -74,6 +74,17 @@ background: #FFFFFF;
 box-shadow: 2px 4px 7px rgba(196, 196, 196, 0.11);
 border-radius: 16px;
 overflow: hidden;
+`;
+
+export const IconBtn = styled.button`
+border: 0;
+background: none;
+padding: 0;
+outline: 0;
+cursor: pointer;
+&:hover {
+  opacity: 0.7
+}
 `;
 
 export const StripedList = styled.ul`
@@ -158,6 +169,7 @@ color: ${({children}) => {
     case '進站中':
       return 'var(--secondary)';
     case '末班車已過':
+    case '今日未營運':
     case '尚未發車':
       return 'var(--text-medium)';
     default:
@@ -243,7 +255,7 @@ margin-right: 0;
 `)}
 `;
 
-export const NavLink = styled(Link)`
+export const MenuLink = styled(NavLink)`
 display: flex;
 align-items: center;
 justify-content: center;
@@ -293,10 +305,20 @@ export const Modal = styled.div`
 border-radius: 16px;
 background: #fff;
 padding: 20px;
-margin: 20px;
+margin: 0 20px;
 width: 600px;
+position: relative;
+${IconBtn} {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+}
+${ItemTitle} {
+  margin-right: 1em;
+}
 ${desktopMedia(`
-padding: 24px 36px;
+padding: 48px 36px;
+width: 1100px;
 `)}
 `;
 
@@ -304,6 +326,9 @@ export const MapContainer = styled.div`
 height: 360px;
 border-radius: 16px;
 margin-top: 20px;
+${desktopMedia(`
+margin-top: 0px;
+`)}
 `;
 
 // Quick Search
@@ -384,9 +409,9 @@ export const DropdownListItem = styled.li`
 export const EmptyWrapper = styled.div`
 text-align: center;
 background: url(${emptyBg}) center bottom 10%/cover no-repeat;
-height: 30vw;
+height: 35vw;
 min-height: 240px;
-max-height: 340px;
+max-height: calc(100vh - 390px);
 padding: 60px 30px;
 `;
 
@@ -406,12 +431,15 @@ justify-content: flex-end;
 margin-bottom: 16px;
 ${DropdownWrapper} {
   width: 160px;
-  margin-bottom: 10px;
+}
+${PageTitle} {
+  margin-top: 10px;
 }
 ${desktopMedia(`
 justify-content: space-between;
-> h1 {
+${PageTitle} {
   order: -1;
+  margin-top: 0px;
 }
 ${DropdownWrapper} {
   width: 310px;

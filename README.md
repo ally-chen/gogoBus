@@ -1,70 +1,29 @@
-# Getting Started with Create React App
+# GoGo Bus | 全台公車動態時刻查詢應用服務
+本專案為The F2E第三周挑戰前端個人組作品->[Demo](https://ally-chen.github.io/gogoBus)\
+採用設計師[Tracy](https://2021.thef2e.com/users/6296427084285739806)的美美設計搞（感謝設計師大大！
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## 系統說明
+(本專案使用create react app建立)
+`npm install` -> 安裝此專案必須的模組\
+`npm start` -> 運行此專案 (打開[本地端](http://localhost:3101)即可瀏覽)
 
-## Available Scripts
+p.s 專案所用到的token存放在根目錄的.env，須設定REACT_APP_TDXID、REACT_APP_TDXKEY以存取TDX API，\
+以及REACT_APP_MAPBOXTOKEN來存取mapbox地圖
 
-In the project directory, you can run:
+版本說明：\
+Node.js: 14.15.4\
+React: 17.0.2
 
-### `yarn start`
+## 資料夾說明
+* containers - 頁面
+* components - 共用元件、頁面元件
+* images - 圖片、icon
+* store - 用於全域的資料(專案內實作的資料為使用者的定位資料)
+* common.js -> 常用function與custom hooks
+* const.js -> 常用常數
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
-
-### `yarn test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `yarn build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## 使用技術
+* React(hooks)
+* Axios
+* styled-components
+* [leaflet](https://leafletjs.com/)

@@ -2,7 +2,7 @@ import Logo from '@/images/logo.svg';
 import icSearch from '@/images/ic-search.svg';
 import icMapPin from '@/images/ic-map-pin.svg';
 import icAlert from '@/images/ic-alert.svg';
-import {MenuWrapper, LinkLogo, NavList, NavListItem, NavLink} from '@/style';
+import {MenuWrapper, LinkLogo, NavList, NavListItem, MenuLink as NavLink} from '@/style';
 
 const Menu = () => (
   <MenuWrapper>

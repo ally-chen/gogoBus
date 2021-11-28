@@ -70,7 +70,7 @@ const Nearby = () => {
           ) : <Empty text="附近沒有站牌" />}
       </Board>
       {modalInfo && (
-        <StationModal data={modalInfo} close={closeModal} />
+        <StationModal data={modalInfo} close={closeModal} showUserPopup />
       )}
     </>
   );

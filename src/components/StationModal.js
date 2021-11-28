@@ -1,16 +1,44 @@
 import React from 'react';
 import L from 'leaflet';
 import { useLocationStore } from '@/store/locationStore';
-import { auth, directionText } from "@/const";
-import userMarker from "@/images/user-marker.svg";
+import { auth, directionText, cityCodeMap, statusMap } from "@/const";
+import userMarker from "@/images/user-marker-point.svg";
+import icClose from "@/images/ic-close.svg";
 import mapMarker from "@/images/ic-map-marker-main.svg";
-import {ItemTitle, Overlay, ModalWrapper, Modal, MapContainer} from '@/style';
+import {commonAxios} from "@/common";
+import {ItemTitle, Overlay, ModalWrapper, Modal, MapContainer, IconBtn,
+  SearchWrapper, SearchCol1, SearchCol2, StopsStripedList, StopStatus, BusPlate} from '@/style';
 
 let map;
 
-const StationModal = ({data, close}) => {
+const StationModal = ({data, close, showUserPopup}) => {
   const ref = React.useRef();
   const {locationData} = useLocationStore();
+  const [routeData, setRouteData] = React.useState([]);
+
+  const getRouteData = () => {
+    const city = cityCodeMap[data.LocationCityCode];
+
+    Promise.all([
+      commonAxios({
+        url: `/v2/Bus/EstimatedTimeOfArrival/City/${city}/PassThrough/Station/${data.StationID}?`,
+      }),
+      commonAxios({
+        url: `/v2/Bus/RealTimeNearStop/City/${city}/PassThrough/Station/${data.StationID}?`,
+      })
+    ]).then((results) => {
+      const [routes, realBusData] = results;
+      if (realBusData.length > 0) {
+        realBusData.forEach((bus) => {
+          const routeIndex = routes.findIndex((n) => n.Direction === bus.Direction && n.SubRouteUID === bus.SubRouteUID);
+          if (routeIndex > -1) {
+            routes[routeIndex].BusPlate = bus.PlateNumb;
+          }
+        });
+      }
+      setRouteData(routes);
+    });
+  };
   const initMap = (config, ele) => {
     const { PositionLat: lat, PositionLon: lng } = config;
     const mymap = L.map(ele).setView([lat, lng], 15);
@@ -33,19 +61,23 @@ const StationModal = ({data, close}) => {
     }).addTo(mymap);
     // L.marker([lat, lng]).addTo(mymap);
     if (locationData) {
-      L.marker([locationData.lat, locationData.lng], {
+      const current = L.marker([locationData.lat, locationData.lng], {
         icon: L.icon({
           iconUrl: userMarker,
-          iconAnchor: [15, 34],
-          popupAnchor: [0, -34]
+          iconAnchor: [7, 8],
+          popupAnchor: [0, -6]
         })
       }).addTo(mymap);
+      if (showUserPopup) {
+        current.bindPopup('目前位置').openPopup();
+      }
     }
   
     return mymap;
   };
   React.useEffect(() => {
     map = initMap(data.StationPosition, ref.current);
+    getRouteData();
     return () => {
       map.remove();
     }
@@ -54,9 +86,25 @@ const StationModal = ({data, close}) => {
     <Overlay onClick={close}>
       <ModalWrapper>
         <Modal onClick={(e) => e.stopPropagation()}>
-          <ItemTitle>{data.StationName.Zh_tw} - {directionText[data.Bearing]}</ItemTitle>
-          行經路線：{data.Stops.map((s) => s.RouteName.Zh_tw).join(', ')}
-          <MapContainer ref={ref} />
+          <IconBtn onClick={close} type="button"><img src={icClose} alt="x" width="20" /></IconBtn>
+          <SearchWrapper style={{height: 'auto', minHeight: 'auto'}}>
+            <SearchCol1>
+              <ItemTitle>{data.StationName.Zh_tw} - {directionText[data.Bearing]}</ItemTitle>
+              <small style={{marginBottom: 12}}>{data.StationAddress}</small>
+              <StopsStripedList>
+                {routeData.map((route) => (
+                  <li key={route.RouteUID}>
+                    <span>{route.RouteName.Zh_tw}</span>
+                    <StopStatus>{statusMap[route.StopStatus]}</StopStatus>
+                    {route.BusPlate && <BusPlate>{route.BusPlate}</BusPlate>}
+                  </li>
+                ))}
+              </StopsStripedList>
+            </SearchCol1>
+            <SearchCol2>
+              <MapContainer ref={ref} />
+            </SearchCol2>
+          </SearchWrapper>
         </Modal>
       </ModalWrapper>
     </Overlay>
