@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/gogoBus/static/css/main.67273e18.chunk.css",
-    "main.js": "/gogoBus/static/js/main.f2247b79.chunk.js",
-    "main.js.map": "/gogoBus/static/js/main.f2247b79.chunk.js.map",
+    "main.js": "/gogoBus/static/js/main.b71d5070.chunk.js",
+    "main.js.map": "/gogoBus/static/js/main.b71d5070.chunk.js.map",
     "runtime-main.js": "/gogoBus/static/js/runtime-main.e3c44ad1.js",
     "runtime-main.js.map": "/gogoBus/static/js/runtime-main.e3c44ad1.js.map",
     "static/js/2.7ae4ca0f.chunk.js": "/gogoBus/static/js/2.7ae4ca0f.chunk.js",
@@ -32,6 +32,6 @@
     "static/js/runtime-main.e3c44ad1.js",
     "static/js/2.7ae4ca0f.chunk.js",
     "static/css/main.67273e18.chunk.css",
-    "static/js/main.f2247b79.chunk.js"
+    "static/js/main.b71d5070.chunk.js"
   ]
 }
