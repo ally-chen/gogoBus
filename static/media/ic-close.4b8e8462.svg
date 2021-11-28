@@ -1,0 +1,14 @@
+<svg version="1.2" baseProfile="tiny-ps" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="50" height="50">
+	<title>新增專案</title>
+	<defs>
+		<linearGradient id="grd1" gradientUnits="userSpaceOnUse"  x1="5" y1="25.379" x2="45.351" y2="25.379">
+			<stop offset="0" stop-color="#486ae8"  />
+			<stop offset="1" stop-color="#486ae8"  />
+		</linearGradient>
+	</defs>
+	<style>
+		tspan { white-space:pre }
+		.shp0 { fill: none;stroke: url(#grd1);stroke-linecap:round;stroke-width: 5 } 
+	</style>
+	<path id="形狀 1" class="shp0" d="M45.35 44.15L44.74 44.78L5 5.62L5.62 5L45.35 44.15ZM44.33 5.41L44.95 6.02L5.8 45.76L5.18 45.14L44.33 5.41Z" />
+</svg>
