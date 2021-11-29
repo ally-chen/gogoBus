@@ -56,7 +56,7 @@ const News = () => {
         {data.length > 0 ? (
           <StripedList>
             {data.map((n, i) => (
-              <li key={n.StationUID}>
+              <li key={n.NewsID}>
                 <Link to="#" onClick={(e) => showModal(e, n)}>
                   <ItemTitle>{moment(n.PublishTime).format('YYYY/MM/DD')}</ItemTitle>
                   {n.Title}

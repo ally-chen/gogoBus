@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 import { LocationContextProvider } from '@/store/locationStore';
 import Menu from "@/components/Menu";
+import Footer from "@/components/Footer";
 import Search from "@/containers/Search";
 import Nearby from "@/containers/Nearby";
 import News from "@/containers/News";
@@ -16,6 +17,7 @@ const Layout = () => (
     <Menu />
     <PageWrapper>
       <Outlet />
+      <Footer />
     </PageWrapper>
   </Container>
 );

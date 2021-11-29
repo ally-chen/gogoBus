@@ -277,6 +277,36 @@ height: 62px;
 `)}
 `;
 
+// Footer
+
+export const FooterWrapper = styled.div`
+display: flex;
+justify-content: space-between;
+flex-wrap: wrap;
+align-items: center;
+font-size: 12px;
+color: var(--text-light);
+a {
+  color: var(--text-light);
+  text-decoration: underline;
+  &:hover {
+    color: var(--text-medium);
+  }
+}
+> div {
+  margin-top: 10px;
+}
+${desktopMedia(`
+margin-bottom: -30px;
+`)}
+`;
+
+export const SourceFrom = styled.div`
+display: flex;
+flex-wrap: wrap;
+align-items: center;
+`;
+
 // Modal
 
 export const Overlay = styled.div`
